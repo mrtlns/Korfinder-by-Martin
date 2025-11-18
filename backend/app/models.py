@@ -146,7 +146,7 @@ class Listing(Base):
     subject_id = Column(
         Integer,
         ForeignKey("subjects.id", ondelete="RESTRICT"),
-        nullable=False,
+        nullable=True,
         index=True,
     )
 

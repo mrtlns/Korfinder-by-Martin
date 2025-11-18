@@ -2,11 +2,12 @@
 .DS_Store
 
 # Python / FastAPI
-backend/__pycache__/
 backend/.venv/
 backend/venv/
-backend/*.pyc
 backend/.env
+backend/*.db
+**/__pycache__/
+*.py[cod]
 
 # Swift / Xcode
 ios/DerivedData/

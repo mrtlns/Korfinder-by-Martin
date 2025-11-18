@@ -198,7 +198,14 @@ struct SwipeDeckView: View {
     private func advance(like: Bool) {
         guard index < items.count else { return }
         let current = items[index]
-        let currentId = current.tutor_id ?? current.id
+        guard let targetUserId = current.profileOwnerID else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
+                drag = .zero
+                index += 1
+                if index >= items.count { finished = true }
+            }
+            return
+        }
 
         // смена карточки
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
@@ -209,7 +216,7 @@ struct SwipeDeckView: View {
 
         // отправка свайпа
         Task {
-            let matched = await onSwipe(currentId, like)
+            let matched = await onSwipe(targetUserId, like)
             if matched && like {
                 matchedTitle = current.title
                 showMatch = true

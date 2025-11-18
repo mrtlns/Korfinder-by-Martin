@@ -18,8 +18,8 @@ final class APIClient {
     static let shared = APIClient()
     private init() {}
 
-    // Симулятор: http://127.0.0.1:8000
-    var baseURL = URL(string: "http://127.0.0.1:8000")!
+    // Базовый адрес зависит от окружения (Debug → localhost, Release → прод)
+    var baseURL = AppConfig.apiBase
     var authToken: String?
 
     static let decoder: JSONDecoder = {
@@ -188,14 +188,45 @@ final class APIClient {
         let photo_url: String?
     }
 
+    struct ListingUpdateReq: Codable {
+        let subject_id: Int?
+        let title: String?
+        let description: String?
+        let city: String?
+        let is_online: Bool?
+        let is_offline: Bool?
+        let hourly_rate: Double?
+        let level: String?
+        let is_published: Bool?
+        let photo_url: String?
+    }
+
     func createListing(_ r: ListingCreateReq) async throws -> ListingOut {
         let (d, _) = try await request("api/v1/listings", method: "POST", body: r)
+        return try Self.decoder.decode(ListingOut.self, from: d)
+    }
+
+    func listing(id: Int) async throws -> ListingOut {
+        let (d, _) = try await request("api/v1/listings/\(id)")
         return try Self.decoder.decode(ListingOut.self, from: d)
     }
 
     func myListings() async throws -> [ListingOut] {
         let (d, _) = try await request("api/v1/listings/me")
         return try Self.decoder.decode([ListingOut].self, from: d)
+    }
+
+    func updateListing(id: Int, payload: ListingUpdateReq) async throws -> ListingOut {
+        let (d, _) = try await request(
+            "api/v1/listings/\(id)",
+            method: "PATCH",
+            body: payload
+        )
+        return try Self.decoder.decode(ListingOut.self, from: d)
+    }
+
+    func deleteListing(id: Int) async throws {
+        _ = try await request("api/v1/listings/\(id)", method: "DELETE")
     }
 
     // MARK: - Swipes
@@ -242,32 +273,32 @@ final class APIClient {
     }
     
     struct MessageRes: Codable, Identifiable {
-            let id: Int
-            let match_id: Int
-            let sender_id: Int
-            let body: String
-            let created_at: Date
-        }
+        let id: Int
+        let match_id: Int
+        let sender_id: Int
+        let body: String
+        let created_at: Date
+    }
 
-        struct MessageCreateReq: Codable {
-            let match_id: Int
-            let body: String
-        }
+    struct MessageCreateReq: Codable {
+        let match_id: Int
+        let body: String
+    }
 
-        func messages(matchId: Int) async throws -> [MessageRes] {
-            let (d, _) = try await request(
-                "api/v1/messages",
-                query: ["match_id": String(matchId)]
-            )
-            return try Self.decoder.decode([MessageRes].self, from: d)
-        }
+    func messages(matchId: Int) async throws -> [MessageRes] {
+        let (d, _) = try await request(
+            "api/v1/messages",
+            query: ["match_id": String(matchId)]
+        )
+        return try Self.decoder.decode([MessageRes].self, from: d)
+    }
 
-        func sendMessage(_ req: MessageCreateReq) async throws -> MessageRes {
-            let (d, _) = try await request(
-                "api/v1/messages",
-                method: "POST",
-                body: req
-            )
-            return try Self.decoder.decode(MessageRes.self, from: d)
-        }
+    func sendMessage(_ req: MessageCreateReq) async throws -> MessageRes {
+        let (d, _) = try await request(
+            "api/v1/messages",
+            method: "POST",
+            body: req
+        )
+        return try Self.decoder.decode(MessageRes.self, from: d)
+    }
 }
