@@ -2,6 +2,7 @@ import Foundation
 
 struct ListingOut: Identifiable, Codable {
     let id: Int
+    let ownerId: Int?
     let tutorId: Int?
     let title: String
     let description: String?
@@ -16,6 +17,17 @@ struct ListingOut: Identifiable, Codable {
 
     // 👇 совместимость со старым UI (SwipeCardView, SwipeDeckView, ListingCard)
     var tutor_id: Int? { tutorId }
+    var owner_id: Int? { ownerId }
+    var profileOwnerID: Int? { ownerId ?? tutorId ?? id }
+    var isTutor: Bool { role == "tutor" }
+    var isStudent: Bool { role == "student" }
+    var roleDisplay: String? {
+        switch role {
+        case "tutor": return "Korepetytor"
+        case "student": return "Uczeń"
+        default: return nil
+        }
+    }
     var price_per_hour: Double? { pricePerHour }
     var photoURL: URL? {
         guard let s = photoUrl, !s.isEmpty else { return nil }
@@ -24,6 +36,7 @@ struct ListingOut: Identifiable, Codable {
 
     enum CodingKeys: String, CodingKey {
         case id
+        case ownerId = "owner_id"
         case tutorId = "tutor_id"
         case title
         case description

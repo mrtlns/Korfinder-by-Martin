@@ -73,6 +73,7 @@ class ListingOut(ORMBase):
     """
 
     id: int
+    owner_id: Optional[int] = None
     tutor_id: Optional[int] = None
 
     title: str

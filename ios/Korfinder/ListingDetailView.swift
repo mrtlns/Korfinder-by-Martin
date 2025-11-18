@@ -22,12 +22,21 @@ struct ListingDetailView: View {
                         .padding(.horizontal)
 
                     // główny blok z opisem i szczegółami
-                    VStack(alignment: .leading, spacing: 12) {
-                        // pełny opis
-                        if let desc = listing.description, !desc.isEmpty {
-                            Text(desc)
-                                .font(.body)
-                                .foregroundStyle(.primary)
+                VStack(alignment: .leading, spacing: 12) {
+                    if let badge = listing.roleDisplay {
+                        HStack(spacing: 8) {
+                            Image(systemName: listing.isTutor ? "graduationcap.fill" : "person.text.rectangle")
+                            Text(badge)
+                        }
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                    }
+
+                    // pełny opis
+                    if let desc = listing.description, !desc.isEmpty {
+                        Text(desc)
+                            .font(.body)
+                            .foregroundStyle(.primary)
                         }
 
                         // separator (opcjonalnie)

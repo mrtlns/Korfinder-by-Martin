@@ -11,6 +11,7 @@ from app.routers import (
     swipes,
     matches,
     messages,
+    listings,
 )
 
 API_PREFIX = "/api/v1"
@@ -62,3 +63,6 @@ app.include_router(matches.router, prefix=API_PREFIX, tags=["matches"])
 
 # messages (chat): /api/v1/messages/...
 app.include_router(messages.router, prefix=API_PREFIX, tags=["messages"])
+
+# listings CRUD: /api/v1/listings/...
+app.include_router(listings.router, prefix=API_PREFIX, tags=["listings"])

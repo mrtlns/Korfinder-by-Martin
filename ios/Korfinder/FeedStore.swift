@@ -76,3 +76,60 @@ final class FeedStore: ObservableObject {
         return "Coś poszło nie tak. Sprawdź Internet i spróbuj ponownie."
     }
 }
+
+
+@MainActor
+final class ListingsStore: ObservableObject {
+    @Published var items: [ListingOut] = []
+    @Published var isLoading = false
+    @Published var errorMessage: String?
+
+    private let api = APIClient.shared
+
+    func reload() async {
+        if isLoading { return }
+        isLoading = true
+        errorMessage = nil
+
+        do {
+            let fetched = try await api.myListings()
+            items = fetched.sorted { (lhs, rhs) in
+                let lhsDate = lhs.createdAt ?? .distantPast
+                let rhsDate = rhs.createdAt ?? .distantPast
+                return lhsDate > rhsDate
+            }
+        } catch {
+            errorMessage = friendly(error)
+        }
+
+        isLoading = false
+    }
+
+    func delete(listingID: Int) async {
+        do {
+            try await api.deleteListing(id: listingID)
+            items.removeAll { $0.id == listingID }
+        } catch {
+            errorMessage = friendly(error)
+        }
+    }
+
+    func reset() {
+        items = []
+        errorMessage = nil
+        isLoading = false
+    }
+
+    private func friendly(_ error: Error) -> String {
+        if case let APIError.http(code, body) = error {
+            switch code {
+            case 401: return "Sesja wygasła. Zaloguj się ponownie."
+            case 403: return "Brak dostępu do ogłoszenia."
+            case 404: return "Nie znaleziono ogłoszenia."
+            case 500...599: return "Serwer ma problemy. Spróbuj ponownie."
+            default: return body ?? "Nieznany błąd (\(code))."
+            }
+        }
+        return "Coś poszło nie tak."
+    }
+}

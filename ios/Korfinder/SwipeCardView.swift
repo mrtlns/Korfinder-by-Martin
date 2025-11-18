@@ -35,6 +35,18 @@ struct SwipeCardView: View {
 
                 // 3) подписи
                 VStack(alignment: .leading, spacing: 6) {
+                    if let badge = listing.roleDisplay {
+                        HStack(spacing: 6) {
+                            Image(systemName: listing.isTutor ? "graduationcap.fill" : "person.text.rectangle")
+                            Text(badge.uppercased())
+                        }
+                        .font(.caption.bold())
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(Color.white.opacity(0.25), in: Capsule())
+                        .foregroundStyle(.black)
+                    }
+
                     Text(listing.title)
                         .font(.title2.bold())
                         .foregroundStyle(.white)
