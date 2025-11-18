@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Python / FastAPI
+backend/__pycache__/
+backend/.venv/
+backend/venv/
+backend/*.pyc
+backend/.env
+
+# Swift / Xcode
+ios/DerivedData/
+ios/Build/
+ios/*.xcuserdatad/
+ios/*.xcuserdata/
+ios/*.xcworkspace/xcuserdata/
+
+# Node (если есть)
+node_modules/
